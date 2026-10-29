@@ -62,7 +62,7 @@
     <p class="muted">Engineer: view and download software. Admin: manage software links.</p>
     <form id="loginForm">
       <label for="userId">User ID</label>
-      <input id="userId" autocomplete="username" placeholder="Enter omkar or omkarsp" required>
+      <input id="userId" autocomplete="username" placeholder="Enter User ID" required>
       <label for="password">Password</label>
       <input id="password" type="password" autocomplete="current-password" placeholder="Enter password" required>
       <button id="loginButton" class="full" type="submit">Login</button>
@@ -100,7 +100,30 @@
         </div>
         <button id="cancelEdit" class="secondary hidden" type="button" style="margin-top:10px">Cancel Edit</button>
       </form>
+
+      <div class="admin" style="margin-top:24px">
+        <h2>Password Management</h2>
+        <p class="muted">Send a secure password-reset link to either account. The user can set a new password from the email.</p>
+        <div class="form-grid" style="grid-template-columns:1fr 1fr">
+          <button id="resetAdminPassword" class="secondary" type="button">Change Admin Password</button>
+          <button id="resetEngineerPassword" class="secondary" type="button">Change Engineer Password</button>
+        </div>
+        <div id="passwordMessage" class="message"></div>
+      </div>
     </section>
+  </section>
+
+  <section id="recoveryCard" class="card narrow hidden">
+    <h2>Set New Password</h2>
+    <p class="muted">Enter and confirm your new password.</p>
+    <form id="recoveryForm">
+      <label for="newPassword">New Password</label>
+      <input id="newPassword" type="password" autocomplete="new-password" placeholder="Enter new password" minlength="8" required>
+      <label for="confirmPassword">Confirm New Password</label>
+      <input id="confirmPassword" type="password" autocomplete="new-password" placeholder="Confirm new password" minlength="8" required>
+      <button id="updatePasswordButton" class="full" type="submit">Update Password</button>
+    </form>
+    <div id="recoveryMessage" class="message"></div>
   </section>
 </main>
 <footer>Software Download Portal</footer>
@@ -290,6 +313,62 @@ $("softwareForm").addEventListener("submit", async (event) => {
   }
 });
 $("cancelEdit").addEventListener("click", resetEdit);
+
+async function sendPasswordReset(email, accountLabel) {
+  if (currentRole !== "admin") return;
+  clearMessage("passwordMessage");
+  $("resetAdminPassword").disabled = true;
+  $("resetEngineerPassword").disabled = true;
+  try {
+    const { error } = await db.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + window.location.pathname
+    });
+    if (error) throw error;
+    showMessage("passwordMessage", "Password reset email sent for " + accountLabel + ". Check the account inbox and spam folder.", "ok");
+  } catch (error) {
+    showMessage("passwordMessage", "Could not send reset email: " + (error.message || "Please try again."));
+  } finally {
+    $("resetAdminPassword").disabled = false;
+    $("resetEngineerPassword").disabled = false;
+  }
+}
+$("resetAdminPassword").addEventListener("click", () => sendPasswordReset(ADMIN_EMAIL, "Admin"));
+$("resetEngineerPassword").addEventListener("click", () => sendPasswordReset(ENGINEER_EMAIL, "Engineer"));
+
+$("recoveryForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  clearMessage("recoveryMessage");
+  const newPassword = $("newPassword").value;
+  const confirmPassword = $("confirmPassword").value;
+  if (newPassword.length < 8) {
+    showMessage("recoveryMessage", "Password must be at least 8 characters.");
+    return;
+  }
+  if (newPassword !== confirmPassword) {
+    showMessage("recoveryMessage", "Passwords do not match.");
+    return;
+  }
+  $("updatePasswordButton").disabled = true;
+  try {
+    const { error } = await db.auth.updateUser({ password: newPassword });
+    if (error) throw error;
+    showMessage("recoveryMessage", "Password updated successfully. You can now log in with your new password.", "ok");
+    $("recoveryForm").reset();
+  } catch (error) {
+    showMessage("recoveryMessage", "Could not update password: " + (error.message || "Please try again."));
+  } finally {
+    $("updatePasswordButton").disabled = false;
+  }
+});
+
+db.auth.onAuthStateChange((event, session) => {
+  if (event === "PASSWORD_RECOVERY") {
+    $("loginCard").classList.add("hidden");
+    $("portalCard").classList.add("hidden");
+    $("recoveryCard").classList.remove("hidden");
+  }
+});
+
 async function deleteLink(link) {
   if (currentRole !== "admin" || !confirm('Delete "' + link.name + '"?')) return;
   clearMessage("portalMessage");
