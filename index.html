@@ -10,13 +10,14 @@
     body { margin:0; font-family:Arial,Helvetica,sans-serif; background:var(--bg); color:#1b2733; }
     header { background:#fff; border-bottom:1px solid var(--line); padding:18px 22px; }
     .head { max-width:1050px; margin:auto; display:flex; align-items:center; gap:14px; }
-    .logo { width:52px; height:52px; border-radius:50%; display:grid; place-items:center; color:#fff; font-weight:800; font-size:13px; background:var(--blue); letter-spacing:.5px; }
+    .logo { width:52px; height:52px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:13px; background:var(--blue); letter-spacing:.5px; }
     h1 { margin:0; color:var(--navy); font-size:22px; }
     .subtitle { margin-top:5px; color:var(--muted); font-size:13px; }
     main { max-width:900px; margin:30px auto; padding:0 16px 30px; }
     .card { background:#fff; border:1px solid var(--line); border-radius:14px; padding:24px; box-shadow:0 6px 24px rgba(22,46,70,.05); }
     .narrow { max-width:440px; margin:35px auto; }
     h2 { margin:0 0 8px; font-size:20px; color:var(--navy); }
+    h3 { margin:0 0 8px; color:var(--navy); font-size:17px; }
     .muted { color:var(--muted); font-size:14px; line-height:1.5; }
     label { display:block; font-weight:600; font-size:13px; margin:17px 0 7px; }
     input { width:100%; padding:12px 13px; border:1px solid #c8d3df; border-radius:8px; font-size:15px; outline:none; }
@@ -42,351 +43,166 @@
     .form-grid button { min-height:42px; }
     .hidden { display:none !important; }
     footer { text-align:center; padding:18px; color:#778592; font-size:12px; }
+    .section-note { margin:4px 0 12px; }
     @media(max-width:640px) { .card { padding:18px; } .form-grid { grid-template-columns:1fr; } .form-grid button { width:100%; } h1 { font-size:18px; } }
   </style>
 </head>
 <body>
-<header>
-  <div class="head">
-    <div class="logo">ATOS</div>
-    <div>
-      <h1>Software Download Portal</h1>
-      <div class="subtitle">ATOS India · Software Links</div>
-    </div>
-  </div>
-</header>
-
+<header><div class="head"><div class="logo">ATOS</div><div><h1>Software Download Portal</h1><div class="subtitle">ATOS India · Software Links</div></div></div></header>
 <main>
   <section id="loginCard" class="card narrow">
     <h2>Sign in</h2>
-    <p class="muted">Engineer: view and download software. Admin: manage software links.</p>
     <form id="loginForm">
-      <label for="userId">User ID</label>
-      <input id="userId" autocomplete="username" placeholder="Enter User ID" required>
-      <label for="password">Password</label>
-      <input id="password" type="password" autocomplete="current-password" placeholder="Enter password" required>
+      <label for="userId">User ID</label><input id="userId" autocomplete="username" placeholder="Enter User ID" required>
+      <label for="password">Password</label><input id="password" type="password" autocomplete="current-password" placeholder="Enter password" required>
       <button id="loginButton" class="full" type="submit">Login</button>
     </form>
     <div id="loginMessage" class="message"></div>
   </section>
 
   <section id="portalCard" class="card hidden">
-    <div class="topline">
-      <div>
-        <h2 id="welcomeTitle">Software Links</h2>
-        <div id="roleLabel" class="status"></div>
-      </div>
-      <button id="logoutButton" class="secondary" type="button">Logout</button>
-    </div>
+    <div class="topline"><div><h2 id="welcomeTitle">Software Links</h2><div id="roleLabel" class="status"></div></div><button id="logoutButton" class="secondary" type="button">Logout</button></div>
     <p class="muted">Choose Download to open the file link. Large files can be hosted on Google Drive or another approved company location.</p>
-    <div id="softwareList" class="list"></div>
-    <div id="portalMessage" class="message"></div>
+    <div id="softwareList" class="list"></div><div id="portalMessage" class="message"></div>
 
     <section id="adminPanel" class="admin hidden">
       <h2>Manage Software Links</h2>
-      <p class="muted">Only the Admin account can add, edit, or delete links.</p>
-      <form id="softwareForm">
-        <input id="editId" type="hidden">
-        <div class="form-grid">
-          <div>
-            <label for="softwareName">Software / File Name</label>
-            <input id="softwareName" placeholder="e.g. FCC Tool" required>
-          </div>
-          <div>
-            <label for="softwareUrl">Download URL</label>
-            <input id="softwareUrl" type="url" placeholder="https://..." required>
-          </div>
-          <button id="saveButton" type="submit">Add Link</button>
-        </div>
-        <button id="cancelEdit" class="secondary hidden" type="button" style="margin-top:10px">Cancel Edit</button>
-      </form>
+      <form id="softwareForm"><input id="editId" type="hidden"><div class="form-grid">
+        <div><label for="softwareName">Software / File Name</label><input id="softwareName" placeholder="e.g. FCC Tool" required></div>
+        <div><label for="softwareUrl">Download URL</label><input id="softwareUrl" type="url" placeholder="https://..." required></div>
+        <button id="saveButton" type="submit">Add Link</button>
+      </div><button id="cancelEdit" class="secondary hidden" type="button" style="margin-top:10px">Cancel Edit</button></form>
 
-      <div class="admin" style="margin-top:24px">
-        <h2>Password Management</h2>
-        <p class="muted">Send a secure password-reset link to either account. The user can set a new password from the email.</p>
-        <div class="form-grid" style="grid-template-columns:1fr 1fr">
-          <button id="resetAdminPassword" class="secondary" type="button">Change Admin Password</button>
-          <button id="resetEngineerPassword" class="secondary" type="button">Change Engineer Password</button>
-        </div>
-        <div id="passwordMessage" class="message"></div>
+      <div class="admin">
+        <h2>Engineer User Management</h2>
+        <p class="muted section-note">Create engineer accounts, change User IDs, or reset passwords. New accounts use a username and the default password you set here.</p>
+        <form id="addUserForm"><div class="form-grid">
+          <div><label for="newUsername">New User ID</label><input id="newUsername" placeholder="e.g. engineer01" autocomplete="off" required></div>
+          <div><label for="newUserPassword">Default Password</label><input id="newUserPassword" type="password" placeholder="Set initial password" minlength="8" required></div>
+          <button id="addUserButton" type="submit">Add User</button>
+        </div></form>
+        <div id="userMessage" class="message"></div>
+        <div id="userList" class="list" style="margin-top:14px"></div>
+      </div>
+
+      <div class="admin">
+        <h2>Admin Account</h2>
+        <p class="muted section-note">Change the Admin User ID or password for the account currently signed in.</p>
+        <form id="adminAccountForm"><div class="form-grid" style="grid-template-columns:1fr 1fr auto">
+          <div><label for="adminNewUsername">New Admin User ID</label><input id="adminNewUsername" placeholder="New Admin User ID" required></div>
+          <div><label for="adminNewPassword">New Password (optional)</label><input id="adminNewPassword" type="password" minlength="8" placeholder="Leave blank to keep current"></div>
+          <button id="saveAdminAccount" type="submit">Save Admin</button>
+        </div></form>
+        <div id="adminAccountMessage" class="message"></div>
       </div>
     </section>
   </section>
-
-  <section id="recoveryCard" class="card narrow hidden">
-    <h2>Set New Password</h2>
-    <p class="muted">Enter and confirm your new password.</p>
-    <form id="recoveryForm">
-      <label for="newPassword">New Password</label>
-      <input id="newPassword" type="password" autocomplete="new-password" placeholder="Enter new password" minlength="8" required>
-      <label for="confirmPassword">Confirm New Password</label>
-      <input id="confirmPassword" type="password" autocomplete="new-password" placeholder="Confirm new password" minlength="8" required>
-      <button id="updatePasswordButton" class="full" type="submit">Update Password</button>
-    </form>
-    <div id="recoveryMessage" class="message"></div>
-  </section>
 </main>
 <footer>Software Download Portal</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/*
-  SETUP BEFORE USING:
-  1. Replace ENGINEER_EMAIL with the exact email shown for the Engineer user
-     in Supabase Authentication > Users.
-  2. Replace ADMIN_EMAIL with the exact email shown for the Admin user.
-  3. Do not put passwords or a Supabase Secret key in this file.
-*/
-const SUPABASE_URL = "https://bpbcngyzdxpujlczyuan.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_uGV1f69iuGwz7gosUhDX1A_inZOwDrQ";
-const ENGINEER_EMAIL = "omkar.atos@outlook.com";
-const ADMIN_EMAIL = "omkardiggi143@gmail.com";
-const ADMIN_UID = "7963bfad-4bfb-480f-80cc-d1f5c29e772f";
-const ENGINEER_UID = "cebd50f4-f9bb-4db6-be7e-cd759081d3a0";
-
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-const $ = (id) => document.getElementById(id);
-let currentRole = null;
-let links = [];
-
-function showMessage(id, text, type="error") {
-  const el = $(id);
-  el.textContent = text;
-  el.className = "message show " + type;
-}
-function clearMessage(id) {
-  const el = $(id);
-  el.textContent = "";
-  el.className = "message";
-}
-function safeUrl(url) {
-  try {
-    const u = new URL(url);
-    return u.protocol === "https:" || u.protocol === "http:";
-  } catch { return false; }
-}
-function getLoginEmail(userId) {
-  const id = userId.trim().toLowerCase();
-  if (id === "omkar") return ENGINEER_EMAIL;
-  if (id === "omkarsp") return ADMIN_EMAIL;
-  if (id.includes("@")) return id;
-  return null;
-}
-async function login(userId, password) {
-  const email = getLoginEmail(userId);
-  if (!email || email.startsWith("PUT_")) {
-    throw new Error("Email mapping is not configured. In index.html, replace ENGINEER_EMAIL and ADMIN_EMAIL with the exact emails from Supabase Authentication > Users.");
-  }
-  const { data, error } = await db.auth.signInWithPassword({ email, password });
-  if (error) throw error;
-  const user = data.user;
-  if (user.id === ADMIN_UID) currentRole = "admin";
-  else if (user.id === ENGINEER_UID) currentRole = "engineer";
-  else {
-    await db.auth.signOut();
-    throw new Error("This account is not registered as the Engineer or Admin for this portal.");
-  }
-  await showPortal(user);
-}
-async function showPortal(user) {
-  $("loginCard").classList.add("hidden");
-  $("portalCard").classList.remove("hidden");
-  $("welcomeTitle").textContent = currentRole === "admin" ? "Admin Dashboard" : "Software Download Links";
-  $("roleLabel").textContent = currentRole === "admin" ? "Signed in as Admin" : "Signed in as Engineer";
-  $("adminPanel").classList.toggle("hidden", currentRole !== "admin");
-  clearMessage("portalMessage");
-  await loadLinks();
-}
-async function loadLinks() {
-  $("softwareList").innerHTML = '<p class="muted">Loading software links...</p>';
-  const { data, error } = await db.from("software_links").select("id,name,download_url,created_at").order("created_at", { ascending: false });
-  if (error) {
-    $("softwareList").innerHTML = "";
-    showMessage("portalMessage", "Could not load links: " + error.message);
-    return;
-  }
-  links = data || [];
-  renderLinks();
-}
-function renderLinks() {
-  const list = $("softwareList");
-  list.innerHTML = "";
-  if (!links.length) {
-    list.innerHTML = '<p class="muted">No software links added yet. Admin can add the first link below.</p>';
-    return;
-  }
-  links.forEach(link => {
-    const row = document.createElement("div");
-    row.className = "item";
-    const name = document.createElement("div");
-    name.className = "item-name";
-    name.textContent = link.name;
-    const actions = document.createElement("div");
-    actions.className = "item-actions";
-    if (safeUrl(link.download_url)) {
-      const a = document.createElement("a");
-      a.className = "btn";
-      a.href = link.download_url;
-      a.target = "_blank";
-      a.rel = "noopener noreferrer";
-      a.textContent = "Download";
-      actions.appendChild(a);
-    }
-    if (currentRole === "admin") {
-      const edit = document.createElement("button");
-      edit.className = "secondary";
-      edit.type = "button";
-      edit.textContent = "Edit";
-      edit.addEventListener("click", () => startEdit(link));
-      const del = document.createElement("button");
-      del.className = "danger";
-      del.type = "button";
-      del.textContent = "Delete";
-      del.addEventListener("click", () => deleteLink(link));
-      actions.append(edit, del);
-    }
-    row.append(name, actions);
-    list.appendChild(row);
+/* Chromium 51 compatible frontend. No async/await, arrow functions, optional chaining, nullish coalescing, or Supabase JS SDK. */
+var SUPABASE_URL = "https://bpbcngyzdxpujlczyuan.supabase.co";
+var SUPABASE_PUBLISHABLE_KEY = "sb_publishable_uGV1f69iuGwz7gosUhDX1A_inZOwDrQ";
+var ADMIN_UID = "7963bfad-4bfb-480f-80cc-d1f5c29e772f";
+var ENGINEER_UID = "cebd50f4-f9bb-4db6-be7e-cd759081d3a0";
+var ADMIN_EMAIL = "omkardiggi143@gmail.com";
+var ENGINEER_EMAIL = "omkar.atos@outlook.com";
+var FUNCTION_URL = SUPABASE_URL + "/functions/v1/manage-users";
+var STORAGE_KEY = "atos_portal_session_v1";
+var currentSession = null;
+var currentUser = null;
+var currentRole = null;
+var links = [];
+function byId(id) { return document.getElementById(id); }
+function showMessage(id, message, type) { var el=byId(id); el.textContent=message; el.className="message show "+(type||"error"); }
+function clearMessage(id) { var el=byId(id); el.textContent=""; el.className="message"; }
+function saveSession(session) { currentSession=session; try { localStorage.setItem(STORAGE_KEY, JSON.stringify(session)); } catch(e) {} }
+function clearSession() { currentSession=null; currentUser=null; currentRole=null; try { localStorage.removeItem(STORAGE_KEY); } catch(e) {} }
+function readSession() { try { var s=localStorage.getItem(STORAGE_KEY); return s ? JSON.parse(s) : null; } catch(e) { return null; } }
+function request(method, url, body, token, extraHeaders) {
+  return new Promise(function(resolve,reject) {
+    var xhr=new XMLHttpRequest(); xhr.open(method,url,true); xhr.setRequestHeader("apikey",SUPABASE_PUBLISHABLE_KEY); xhr.setRequestHeader("Accept","application/json");
+    if (body !== null && typeof body !== "undefined") xhr.setRequestHeader("Content-Type","application/json");
+    if (token) xhr.setRequestHeader("Authorization","Bearer "+token); else xhr.setRequestHeader("Authorization","Bearer "+SUPABASE_PUBLISHABLE_KEY);
+    if (extraHeaders) { for (var h in extraHeaders) if (Object.prototype.hasOwnProperty.call(extraHeaders,h)) xhr.setRequestHeader(h,extraHeaders[h]); }
+    xhr.onreadystatechange=function(){ if(xhr.readyState===4){ var data=null; try { data=xhr.responseText ? JSON.parse(xhr.responseText) : {}; } catch(e) { data={message:xhr.responseText}; }
+      if(xhr.status>=200 && xhr.status<300) resolve({data:data,status:xhr.status}); else { var msg=(data && (data.msg || data.message || data.error_description || data.error)) || ("HTTP "+xhr.status); reject(new Error(msg)); }
+    }};
+    xhr.onerror=function(){ reject(new Error("Network request failed. Check internet and TLS connectivity.")); };
+    xhr.ontimeout=function(){ reject(new Error("Request timed out.")); }; xhr.timeout=30000;
+    xhr.send(body !== null && typeof body !== "undefined" ? JSON.stringify(body) : null);
   });
 }
-function startEdit(link) {
-  $("editId").value = link.id;
-  $("softwareName").value = link.name;
-  $("softwareUrl").value = link.download_url;
-  $("saveButton").textContent = "Save Changes";
-  $("cancelEdit").classList.remove("hidden");
-  $("softwareName").focus();
+function functionRequest(payload) {
+  if (!currentSession || !currentSession.access_token) return Promise.reject(new Error("Please sign in again."));
+  return request("POST",FUNCTION_URL,payload,currentSession.access_token,{"Content-Type":"application/json"});
 }
-function resetEdit() {
-  $("editId").value = "";
-  $("softwareForm").reset();
-  $("saveButton").textContent = "Add Link";
-  $("cancelEdit").classList.add("hidden");
+function loginEmailForUsername(username) {
+  var u=username.replace(/^\s+|\s+$/g,"").toLowerCase();
+  if (u==="omkar") return ENGINEER_EMAIL;
+  if (u==="omkarsp") return ADMIN_EMAIL;
+  if (!/^[a-z0-9._-]{3,40}$/.test(u)) throw new Error("Use a User ID with 3-40 letters, numbers, dots, underscores or hyphens.");
+  return u+"@portal.invalid";
 }
-$("loginForm").addEventListener("submit", async (event) => {
-  event.preventDefault();
-  clearMessage("loginMessage");
-  $("loginButton").disabled = true;
-  $("loginButton").textContent = "Signing in...";
-  try {
-    await login($("userId").value, $("password").value);
-  } catch (error) {
-    showMessage("loginMessage", error.message || "Login failed.");
-  } finally {
-    $("loginButton").disabled = false;
-    $("loginButton").textContent = "Login";
-  }
-});
-$("logoutButton").addEventListener("click", async () => {
-  await db.auth.signOut();
-  currentRole = null;
-  links = [];
-  $("portalCard").classList.add("hidden");
-  $("loginCard").classList.remove("hidden");
-  $("loginForm").reset();
-  resetEdit();
-});
-$("softwareForm").addEventListener("submit", async (event) => {
-  event.preventDefault();
-  if (currentRole !== "admin") return;
-  clearMessage("portalMessage");
-  const name = $("softwareName").value.trim();
-  const download_url = $("softwareUrl").value.trim();
-  if (!name || !safeUrl(download_url)) {
-    showMessage("portalMessage", "Enter a file name and a valid http/https download URL.");
-    return;
-  }
-  const id = $("editId").value;
-  $("saveButton").disabled = true;
-  try {
-    let result;
-    if (id) result = await db.from("software_links").update({ name, download_url, updated_at: new Date().toISOString() }).eq("id", Number(id));
-    else result = await db.from("software_links").insert({ name, download_url });
-    if (result.error) throw result.error;
-    resetEdit();
-    showMessage("portalMessage", id ? "Software link updated." : "Software link added.", "ok");
-    await loadLinks();
-  } catch (error) {
-    showMessage("portalMessage", "Could not save link: " + error.message);
-  } finally {
-    $("saveButton").disabled = false;
-  }
-});
-$("cancelEdit").addEventListener("click", resetEdit);
-
-async function sendPasswordReset(email, accountLabel) {
-  if (currentRole !== "admin") return;
-  clearMessage("passwordMessage");
-  $("resetAdminPassword").disabled = true;
-  $("resetEngineerPassword").disabled = true;
-  try {
-    const { error } = await db.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + window.location.pathname
-    });
-    if (error) throw error;
-    showMessage("passwordMessage", "Password reset email sent for " + accountLabel + ". Check the account inbox and spam folder.", "ok");
-  } catch (error) {
-    showMessage("passwordMessage", "Could not send reset email: " + (error.message || "Please try again."));
-  } finally {
-    $("resetAdminPassword").disabled = false;
-    $("resetEngineerPassword").disabled = false;
-  }
+function roleForUser(user) {
+  if (!user) return null;
+  if (user.id===ADMIN_UID) return "admin";
+  if (user.id===ENGINEER_UID) return "engineer";
+  if (user.app_metadata && user.app_metadata.portal_role==="admin") return "admin";
+  if (user.app_metadata && user.app_metadata.portal_role==="engineer") return "engineer";
+  return null;
 }
-$("resetAdminPassword").addEventListener("click", () => sendPasswordReset(ADMIN_EMAIL, "Admin"));
-$("resetEngineerPassword").addEventListener("click", () => sendPasswordReset(ENGINEER_EMAIL, "Engineer"));
-
-$("recoveryForm").addEventListener("submit", async (event) => {
-  event.preventDefault();
-  clearMessage("recoveryMessage");
-  const newPassword = $("newPassword").value;
-  const confirmPassword = $("confirmPassword").value;
-  if (newPassword.length < 8) {
-    showMessage("recoveryMessage", "Password must be at least 8 characters.");
-    return;
-  }
-  if (newPassword !== confirmPassword) {
-    showMessage("recoveryMessage", "Passwords do not match.");
-    return;
-  }
-  $("updatePasswordButton").disabled = true;
-  try {
-    const { error } = await db.auth.updateUser({ password: newPassword });
-    if (error) throw error;
-    showMessage("recoveryMessage", "Password updated successfully. You can now log in with your new password.", "ok");
-    $("recoveryForm").reset();
-  } catch (error) {
-    showMessage("recoveryMessage", "Could not update password: " + (error.message || "Please try again."));
-  } finally {
-    $("updatePasswordButton").disabled = false;
-  }
-});
-
-db.auth.onAuthStateChange((event, session) => {
-  if (event === "PASSWORD_RECOVERY") {
-    $("loginCard").classList.add("hidden");
-    $("portalCard").classList.add("hidden");
-    $("recoveryCard").classList.remove("hidden");
-  }
-});
-
-async function deleteLink(link) {
-  if (currentRole !== "admin" || !confirm('Delete "' + link.name + '"?')) return;
-  clearMessage("portalMessage");
-  const { error } = await db.from("software_links").delete().eq("id", link.id);
-  if (error) showMessage("portalMessage", "Could not delete link: " + error.message);
-  else {
-    showMessage("portalMessage", "Software link deleted.", "ok");
-    await loadLinks();
-  }
+function login(username,password) {
+  var email; try { email=loginEmailForUsername(username); } catch(e) { return Promise.reject(e); }
+  return request("POST",SUPABASE_URL+"/auth/v1/token?grant_type=password",{email:email,password:password},null).then(function(result){
+    var session=result.data; if(!session || !session.access_token || !session.user) throw new Error("Login response did not contain a valid session.");
+    var role=roleForUser(session.user); if(!role) throw new Error("This account is not registered for this portal. Contact Admin.");
+    saveSession(session); currentUser=session.user; currentRole=role; showPortal();
+  });
 }
-db.auth.getSession().then(async ({ data, error }) => {
-  if (error || !data.session) return;
-  const user = data.session.user;
-  if (user.id === ADMIN_UID) currentRole = "admin";
-  else if (user.id === ENGINEER_UID) currentRole = "engineer";
-  else { await db.auth.signOut(); return; }
-  await showPortal(user);
-});
+function showPortal() {
+  byId("loginCard").classList.add("hidden"); byId("portalCard").classList.remove("hidden");
+  byId("welcomeTitle").textContent=currentRole==="admin" ? "Admin Dashboard" : "Software Download Links";
+  byId("roleLabel").textContent=currentRole==="admin" ? "Signed in as Admin" : "Signed in as Engineer";
+  byId("adminPanel").classList.toggle("hidden",currentRole!=="admin"); clearMessage("portalMessage"); loadLinks();
+  if(currentRole==="admin") { byId("adminNewUsername").value=(currentUser.user_metadata && currentUser.user_metadata.portal_username) || (currentUser.id===ADMIN_UID ? "omkarsp" : ""); loadUsers(); }
+}
+function loadLinks() {
+  byId("softwareList").innerHTML='<p class="muted">Loading software links...</p>';
+  return request("GET",SUPABASE_URL+"/rest/v1/software_links?select=id,name,download_url,created_at&order=created_at.desc",null,currentSession.access_token).then(function(result){ links=result.data || []; renderLinks(); }).catch(function(error){ byId("softwareList").innerHTML=""; showMessage("portalMessage","Could not load links: "+error.message); });
+}
+function safeUrl(value) { try { var u=document.createElement("a"); u.href=value; return u.protocol==="https:" || u.protocol==="http:"; } catch(e) { return false; } }
+function renderLinks() {
+  var list=byId("softwareList"); list.innerHTML="";
+  if(!links.length){ list.innerHTML='<p class="muted">No software links added yet. Admin can add the first link below.</p>'; return; }
+  links.forEach(function(link){ var row=document.createElement("div"); row.className="item"; var name=document.createElement("div"); name.className="item-name"; name.textContent=link.name; var actions=document.createElement("div"); actions.className="item-actions";
+    if(safeUrl(link.download_url)){ var a=document.createElement("a"); a.className="btn"; a.href=link.download_url; a.target="_blank"; a.rel="noopener noreferrer"; a.textContent="Download"; actions.appendChild(a); }
+    if(currentRole==="admin"){ var edit=document.createElement("button"); edit.className="secondary"; edit.type="button"; edit.textContent="Edit"; edit.addEventListener("click",function(){startEdit(link);}); var del=document.createElement("button"); del.className="danger"; del.type="button"; del.textContent="Delete"; del.addEventListener("click",function(){deleteLink(link);}); actions.appendChild(edit); actions.appendChild(del); }
+    row.appendChild(name); row.appendChild(actions); list.appendChild(row);
+  });
+}
+function startEdit(link){ byId("editId").value=link.id; byId("softwareName").value=link.name; byId("softwareUrl").value=link.download_url; byId("saveButton").textContent="Save Changes"; byId("cancelEdit").classList.remove("hidden"); byId("softwareName").focus(); }
+function resetEdit(){ byId("editId").value=""; byId("softwareForm").reset(); byId("saveButton").textContent="Add Link"; byId("cancelEdit").classList.add("hidden"); }
+function deleteLink(link){ if(currentRole!=="admin" || !window.confirm('Delete "'+link.name+'"?')) return; request("DELETE",SUPABASE_URL+"/rest/v1/software_links?id=eq."+encodeURIComponent(link.id),null,currentSession.access_token,{"Prefer":"return=minimal"}).then(function(){showMessage("portalMessage","Software link deleted.","ok");loadLinks();}).catch(function(e){showMessage("portalMessage","Could not delete link: "+e.message);}); }
+function loadUsers(){ byId("userList").innerHTML='<p class="muted">Loading users...</p>'; functionRequest({action:"list"}).then(function(r){renderUsers(r.data.users||[]);}).catch(function(e){byId("userList").innerHTML="";showMessage("userMessage","Could not load users: "+e.message);}); }
+function renderUsers(users){ var list=byId("userList"); list.innerHTML=""; if(!users.length){list.innerHTML='<p class="muted">No engineer accounts found.</p>';return;}
+  users.forEach(function(user){ var row=document.createElement("div");row.className="item";var label=document.createElement("div");label.className="item-name";label.textContent=user.username+"  ·  "+(user.role||"engineer");var actions=document.createElement("div");actions.className="item-actions";
+    if(user.id!==ADMIN_UID && user.role!=="admin") { var rename=document.createElement("button");rename.className="secondary";rename.textContent="Change User ID";rename.type="button";rename.addEventListener("click",function(){var next=window.prompt("Enter new User ID for "+user.username,user.username);if(next===null)return;functionRequest({action:"rename",user_id:user.id,username:next}).then(function(){showMessage("userMessage","User ID updated.","ok");loadUsers();}).catch(function(e){showMessage("userMessage",e.message);});});
+      var reset=document.createElement("button");reset.className="secondary";reset.textContent="Reset Password";reset.type="button";reset.addEventListener("click",function(){var pw=window.prompt("Enter new password (minimum 8 characters) for "+user.username);if(pw===null)return;functionRequest({action:"reset_password",user_id:user.id,password:pw}).then(function(){showMessage("userMessage","Password reset successfully.","ok");}).catch(function(e){showMessage("userMessage",e.message);});});
+      var del=document.createElement("button");del.className="danger";del.textContent="Delete";del.type="button";del.addEventListener("click",function(){if(!window.confirm("Delete engineer account "+user.username+"? This cannot be undone."))return;functionRequest({action:"delete",user_id:user.id}).then(function(){showMessage("userMessage","User deleted.","ok");loadUsers();}).catch(function(e){showMessage("userMessage",e.message);});});
+      actions.appendChild(rename);actions.appendChild(reset);actions.appendChild(del);
+    }
+    row.appendChild(label);row.appendChild(actions);list.appendChild(row);
+  });
+}
+byId("loginForm").addEventListener("submit",function(event){event.preventDefault();clearMessage("loginMessage");byId("loginButton").disabled=true;byId("loginButton").textContent="Signing in...";login(byId("userId").value,byId("password").value).catch(function(e){showMessage("loginMessage",e.message||"Login failed.");}).then(function(){byId("loginButton").disabled=false;byId("loginButton").textContent="Login";},function(){byId("loginButton").disabled=false;byId("loginButton").textContent="Login";});});
+byId("logoutButton").addEventListener("click",function(){var token=currentSession && currentSession.access_token; if(token) request("POST",SUPABASE_URL+"/auth/v1/logout",{},token).then(function(){},function(){}); clearSession();links=[];byId("portalCard").classList.add("hidden");byId("loginCard").classList.remove("hidden");byId("loginForm").reset();resetEdit();});
+byId("softwareForm").addEventListener("submit",function(event){event.preventDefault();if(currentRole!=="admin")return;clearMessage("portalMessage");var name=byId("softwareName").value.replace(/^\s+|\s+$/g,"");var url=byId("softwareUrl").value.replace(/^\s+|\s+$/g,"");if(!name||!safeUrl(url)){showMessage("portalMessage","Enter a file name and a valid http/https download URL.");return;}var id=byId("editId").value;byId("saveButton").disabled=true;var method=id?"PATCH":"POST";var endpoint=SUPABASE_URL+"/rest/v1/software_links"+(id?"?id=eq."+encodeURIComponent(id):"");var payload=id?{name:name,download_url:url,updated_at:new Date().toISOString()}:{name:name,download_url:url};request(method,endpoint,payload,currentSession.access_token,{"Prefer":"return=minimal"}).then(function(){resetEdit();showMessage("portalMessage",id?"Software link updated.":"Software link added.","ok");loadLinks();}).catch(function(e){showMessage("portalMessage","Could not save link: "+e.message);}).then(function(){byId("saveButton").disabled=false;},function(){byId("saveButton").disabled=false;});});
+byId("cancelEdit").addEventListener("click",resetEdit);
+byId("addUserForm").addEventListener("submit",function(event){event.preventDefault();clearMessage("userMessage");var username=byId("newUsername").value.replace(/^\s+|\s+$/g,"").toLowerCase();var password=byId("newUserPassword").value;if(password.length<8){showMessage("userMessage","Password must be at least 8 characters.");return;}byId("addUserButton").disabled=true;functionRequest({action:"create",username:username,password:password}).then(function(){byId("addUserForm").reset();showMessage("userMessage","Engineer account created successfully.","ok");loadUsers();}).catch(function(e){showMessage("userMessage","Could not create user: "+e.message);}).then(function(){byId("addUserButton").disabled=false;},function(){byId("addUserButton").disabled=false;});});
+byId("adminAccountForm").addEventListener("submit",function(event){event.preventDefault();clearMessage("adminAccountMessage");var username=byId("adminNewUsername").value.replace(/^\s+|\s+$/g,"").toLowerCase();var password=byId("adminNewPassword").value;var payload={action:"rename",user_id:currentUser.id,username:username,admin_account:true};if(password)payload.password=password;byId("saveAdminAccount").disabled=true;functionRequest(payload).then(function(){showMessage("adminAccountMessage","Admin account updated. Use the new User ID next time you sign in.","ok");if(password)showMessage("adminAccountMessage","Admin User ID and password updated. Please sign in again with the new credentials.","ok");}).catch(function(e){showMessage("adminAccountMessage","Could not update Admin account: "+e.message);}).then(function(){byId("saveAdminAccount").disabled=false;},function(){byId("saveAdminAccount").disabled=false;});});
+function restoreSession(){var saved=readSession();if(!saved||!saved.access_token)return;request("GET",SUPABASE_URL+"/auth/v1/user",null,saved.access_token).then(function(r){currentUser=r.data;currentRole=roleForUser(currentUser);if(!currentRole){clearSession();return;}showPortal();}).catch(function(){clearSession();});}
+restoreSession();
 </script>
 </body>
 </html>
