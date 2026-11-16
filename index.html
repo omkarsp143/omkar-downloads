@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -28,7 +27,7 @@ button:disabled{opacity:.6;cursor:wait}
 .secondary{background:#eaf2f8;color:#164765}
 .danger{background:#a92e36}
 .topline{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px}
-.message{display:none;margin-top:14px;border-radius:8px;padding:11px 12px;font-size:13px;line-height:1.45}
+.message{display:none;margin-top:14px;border-radius:8px;padding:11px 12px;font-size:13px;line-height:1.45;overflow-wrap:anywhere}
 .message.show{display:block}
 .message.error{background:#fff0f0;color:#8a2028;border:1px solid #f2caca}
 .message.ok{background:#eef9f0;color:#21652d;border:1px solid #cce8d1}
@@ -41,6 +40,7 @@ button:disabled{opacity:.6;cursor:wait}
 .form-grid label{margin-top:10px}
 .form-grid button{min-height:42px}
 .hidden{display:none!important}
+.text-button{background:transparent;color:var(--blue);padding:10px 0;margin-top:8px}
 footer{text-align:center;padding:18px;color:#778592;font-size:12px}
 .section-note{margin:4px 0 12px}
 @media(max-width:640px){.card{padding:18px}.form-grid{grid-template-columns:1fr}.form-grid button{width:100%}h1{font-size:18px}}
@@ -63,7 +63,33 @@ footer{text-align:center;padding:18px;color:#778592;font-size:12px}
 <input id="password" type="password" autocomplete="current-password" placeholder="Enter password" required>
 <button id="loginButton" class="full" type="submit">Login</button>
 </form>
+<button id="forgotButton" class="text-button" type="button">Forgot password?</button>
 <div id="loginMessage" class="message"></div>
+</section>
+
+<section id="forgotCard" class="card narrow hidden">
+<h2>Reset password</h2>
+<p class="muted">Enter your Portal User ID. We will send a password reset link to the email registered for that account.</p>
+<form id="forgotForm">
+<label for="forgotUserId">User ID</label>
+<input id="forgotUserId" autocomplete="username" placeholder="omkar or omkarsp" required>
+<button id="forgotSubmit" class="full" type="submit">Send reset email</button>
+</form>
+<button id="backToLogin" class="text-button" type="button">Back to Login</button>
+<div id="forgotMessage" class="message"></div>
+</section>
+
+<section id="recoveryCard" class="card narrow hidden">
+<h2>Choose a new password</h2>
+<p class="muted">Enter your new password below. Use at least 8 characters.</p>
+<form id="recoveryForm">
+<label for="recoveryPassword">New Password</label>
+<input id="recoveryPassword" type="password" autocomplete="new-password" minlength="8" required>
+<label for="recoveryConfirm">Confirm New Password</label>
+<input id="recoveryConfirm" type="password" autocomplete="new-password" minlength="8" required>
+<button id="recoverySubmit" class="full" type="submit">Update Password</button>
+</form>
+<div id="recoveryMessage" class="message"></div>
 </section>
 
 <section id="portalCard" class="card hidden">
@@ -127,6 +153,7 @@ var ADMIN_EMAIL="omkardiggi143@gmail.com";
 var ENGINEER_EMAIL="omkar.atos@outlook.com";
 var FUNCTION_URL=SUPABASE_URL+"/functions/v1/manage-users";
 var STORAGE_KEY="atos_portal_session_v1";
+var REDIRECT_URL="https://omkarsp143.github.io/omkar-downloads/";
 var currentSession=null,currentUser=null,currentRole=null,links=[];
 
 function byId(id){return document.getElementById(id)}
@@ -191,12 +218,25 @@ function login(name,pw){
 }
 function showPortal(){
  byId("loginCard").classList.add("hidden");
+ byId("forgotCard").classList.add("hidden");
+ byId("recoveryCard").classList.add("hidden");
  byId("portalCard").classList.remove("hidden");
  byId("welcomeTitle").textContent=currentRole==="admin"?"Admin Dashboard":"Software Download Links";
  byId("roleLabel").textContent=currentRole==="admin"?"Signed in as Admin":"Signed in as Engineer";
  byId("adminPanel").classList.toggle("hidden",currentRole!=="admin");
  clearMessage("portalMessage");loadLinks();
  if(currentRole==="admin")loadUsers();
+}
+function showLogin(){
+ byId("portalCard").classList.add("hidden");
+ byId("forgotCard").classList.add("hidden");
+ byId("recoveryCard").classList.add("hidden");
+ byId("loginCard").classList.remove("hidden");
+}
+function showForgot(){
+ byId("loginCard").classList.add("hidden");
+ byId("forgotCard").classList.remove("hidden");
+ clearMessage("forgotMessage");
 }
 function loadLinks(){
  byId("softwareList").innerHTML='<p class="muted">Loading software links...</p>';
@@ -265,6 +305,7 @@ function renderUsers(users){
   res.addEventListener("click",(function(user){return function(){
    var pw=window.prompt("Enter new password (minimum 8 characters) for "+user.username);
    if(pw===null)return;
+   if(pw.length<8){showMessage("userMessage","Password must be at least 8 characters.");return}
    functionRequest({action:"reset_password",user_id:user.id,password:pw}).then(function(){
     showMessage("userMessage","Password reset successfully.","ok");
    }).catch(function(e){showMessage("userMessage",e.message)});
@@ -286,6 +327,74 @@ byId("loginForm").addEventListener("submit",function(ev){
   byId("loginButton").disabled=false;byId("loginButton").textContent="Login";
  },function(){byId("loginButton").disabled=false;byId("loginButton").textContent="Login"});
 });
+byId("forgotButton").addEventListener("click",showForgot);
+byId("backToLogin").addEventListener("click",showLogin);
+
+byId("forgotForm").addEventListener("submit",function(ev){
+ ev.preventDefault();clearMessage("forgotMessage");
+ var email;
+ try{email=loginEmailForUsername(byId("forgotUserId").value)}catch(e){showMessage("forgotMessage",e.message);return}
+ byId("forgotSubmit").disabled=true;byId("forgotSubmit").textContent="Sending...";
+ request("POST",SUPABASE_URL+"/auth/v1/recover?redirect_to="+encodeURIComponent(REDIRECT_URL),{email:email},null).then(function(){
+  showMessage("forgotMessage","Password reset email sent. Open the newest email and click Reset password.","ok");
+ }).catch(function(e){
+  showMessage("forgotMessage","Could not send reset email: "+e.message);
+ }).then(function(){
+  byId("forgotSubmit").disabled=false;byId("forgotSubmit").textContent="Send reset email";
+ },function(){
+  byId("forgotSubmit").disabled=false;byId("forgotSubmit").textContent="Send reset email";
+ });
+});
+
+function parseHash(){
+ var out={},h=window.location.hash.replace(/^#/,""),parts=h?h.split("&"):[];
+ for(var i=0;i<parts.length;i++){
+  var p=parts[i].split("="),k=decodeURIComponent(p.shift()||""),v=decodeURIComponent(p.join("=")||"");
+  out[k]=v;
+ }
+ return out;
+}
+function handleRecovery(){
+ var hash=parseHash();
+ var accessToken=hash.access_token||"";
+ var recoveryType=hash.type==="recovery";
+ if(accessToken&&recoveryType){
+  try{sessionStorage.setItem("atos_recovery_token",accessToken)}catch(e){}
+  byId("loginCard").classList.add("hidden");
+  byId("forgotCard").classList.add("hidden");
+  byId("portalCard").classList.add("hidden");
+  byId("recoveryCard").classList.remove("hidden");
+  return true;
+ }
+ var query=window.location.search;
+ if(query&&query.indexOf("error=")!==-1){
+  showLogin();showMessage("loginMessage","Password recovery link is invalid or expired. Request a new reset email.");
+  return false;
+ }
+ return false;
+}
+byId("recoveryForm").addEventListener("submit",function(ev){
+ ev.preventDefault();clearMessage("recoveryMessage");
+ var p=byId("recoveryPassword").value,c=byId("recoveryConfirm").value,token="";
+ try{token=sessionStorage.getItem("atos_recovery_token")||""}catch(e){}
+ if(p.length<8){showMessage("recoveryMessage","Password must be at least 8 characters.");return}
+ if(p!==c){showMessage("recoveryMessage","Passwords do not match.");return}
+ if(!token){showMessage("recoveryMessage","Recovery session is missing. Request a new reset email.");return}
+ byId("recoverySubmit").disabled=true;byId("recoverySubmit").textContent="Updating...";
+ request("PUT",SUPABASE_URL+"/auth/v1/user",{password:p},token).then(function(){
+  try{sessionStorage.removeItem("atos_recovery_token")}catch(e){}
+  window.history.replaceState(null,document.title,REDIRECT_URL);
+  byId("recoveryForm").reset();
+  showLogin();showMessage("loginMessage","Password updated successfully. Please sign in with your new password.","ok");
+ }).catch(function(e){
+  showMessage("recoveryMessage","Could not update password: "+e.message);
+ }).then(function(){
+  byId("recoverySubmit").disabled=false;byId("recoverySubmit").textContent="Update Password";
+ },function(){
+  byId("recoverySubmit").disabled=false;byId("recoverySubmit").textContent="Update Password";
+ });
+});
+
 byId("logoutButton").addEventListener("click",function(){
  var t=currentSession&&currentSession.access_token;
  if(t)request("POST",SUPABASE_URL+"/auth/v1/logout",{},t).then(function(){},function(){});
@@ -335,7 +444,7 @@ function restoreSession(){
   currentSession=s;showPortal();
  }).catch(function(){clearSession()});
 }
-restoreSession();
+if(!handleRecovery())restoreSession();
 </script>
 </body>
 </html>
